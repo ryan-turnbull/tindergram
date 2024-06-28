@@ -8,6 +8,7 @@ const pexelsClient = createClient(import.meta.env.VITE_PEXELS_API_PK);
 interface SearchData {
   query: string | null;
   results: Photo[];
+  offset: number;
 }
 
 interface PhotoDataContextType {
@@ -19,6 +20,7 @@ interface PhotoDataContextType {
   togglePhotoLike: (photo: Photo) => void;
   updateSearchByTerm: (term: string) => void;
   setWheelPhoto: (photo: Photo | null) => void;
+  loadMorePhotos: () => void;
 }
 
 interface PhotoDataContextProviderProps {
@@ -31,6 +33,7 @@ const PhotoDataContext = createContext<PhotoDataContextType | undefined>(
 
 const initialPhotoData: SearchData = {
   query: null,
+  offset: 0,
   results: [],
 };
 
@@ -98,13 +101,15 @@ export const PhotoDataContextProvider: React.FC<
 
   const updateSearchByTerm = debounce(async (query: string) => {
     try {
+      setLoading(true);
       const resp = await pexelsClient.photos.search({
         query,
         orientation: 'landscape',
+        per_page: 30,
       });
 
       if ('photos' in resp) {
-        setActiveSearchData({ query, results: resp.photos });
+        setActiveSearchData({ query, results: resp.photos, offset: 0 });
       } else {
         throw new Error(`Error fetching photos for query ${query}`);
       }
@@ -114,6 +119,36 @@ export const PhotoDataContextProvider: React.FC<
       setLoading(false);
     }
   }, 500);
+
+  const loadMorePhotos = async () => {
+    if (!activeSearchData.query) {
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const resp = await pexelsClient.photos.search({
+        query: activeSearchData.query,
+        orientation: 'landscape',
+        per_page: 30,
+        offset: activeSearchData.offset + 1,
+      });
+
+      if ('photos' in resp) {
+        setActiveSearchData((data) => ({
+          query: data.query,
+          results: [...data.results, ...resp.photos],
+          offset: data.offset + 1,
+        }));
+      } else {
+        throw new Error(`Error fetching more photos`);
+      }
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const resetSearch = () => {
     setActiveSearchData(initialPhotoData);
@@ -126,6 +161,7 @@ export const PhotoDataContextProvider: React.FC<
         wheelPhoto,
         resetSearch,
         likedPhotos,
+        loadMorePhotos,
         togglePhotoLike,
         setWheelPhoto,
         activeSearchData,

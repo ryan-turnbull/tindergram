@@ -62,10 +62,11 @@ function HomePage() {
                 <p>Liked photos</p>
               </div>
             )}
+            <span className="fixed top-4 right-24" id="heartEmojiGen" />
           </>
         }
       >
-        <div className="max-w-2xl mx-auto px-4 relative">
+        <div className="max-w-2xl mx-auto px-4 pb-24 relative">
           {(loading || activeSearchData.query) && <SearchResults />}
         </div>
       </StickyHeaderLayout>

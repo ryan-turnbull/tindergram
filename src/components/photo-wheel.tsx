@@ -3,9 +3,18 @@ import { usePhotoDataContext } from '../data/images';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { routes } from '../utils/routes';
+import { useReward } from 'react-rewards';
 
 export const PhotoWheel = ({ onComplete }: { onComplete: () => void }) => {
   const navigate = useNavigate();
+  const { reward } = useReward('lovePhotoButton', 'emoji', {
+    emoji: ['❤️'],
+    elementCount: 5,
+    decay: 0.99,
+    spread: 45,
+    startVelocity: 10,
+    lifetime: 100,
+  });
 
   const { wheelPhoto, togglePhotoLike, activeSearchData } =
     usePhotoDataContext();
@@ -34,6 +43,7 @@ export const PhotoWheel = ({ onComplete }: { onComplete: () => void }) => {
   };
 
   const handleLike = () => {
+    reward();
     togglePhotoLike(stackSubset[0]);
     setSessionStack(sessionStack.slice(1));
   };
@@ -87,7 +97,7 @@ export const PhotoWheel = ({ onComplete }: { onComplete: () => void }) => {
           );
         })}
       </div>
-      <Button color="success" onClick={handleLike}>
+      <Button color="success" id="lovePhotoButton" onClick={handleLike}>
         Love
       </Button>
     </div>
