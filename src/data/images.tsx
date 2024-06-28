@@ -10,85 +10,93 @@ interface SearchData {
   results: Photo[];
 }
 
-interface ImageDataContextType {
+interface PhotoDataContextType {
   loading: boolean;
   activeSearchData: SearchData;
-  likedImages: Record<string, number[]>;
-  toggleImageLike: (id: number) => void;
+  wheelPhoto: Photo | null;
+  likedPhotos: Record<string, Photo[]>;
+  togglePhotoLike: (photo: Photo) => void;
+  setWheelPhoto: (photo: Photo | null) => void;
   updateSearchByTerm: (term: string) => void;
 }
 
-interface ImageDataContextProviderProps {
+interface PhotoDataContextProviderProps {
   children: ReactNode;
 }
 
-const ImageDataContext = createContext<ImageDataContextType | undefined>(
+const PhotoDataContext = createContext<PhotoDataContextType | undefined>(
   undefined,
 );
 
 // eslint-disable-next-line react-refresh/only-export-components
-export const useImageDataContext = (): ImageDataContextType => {
-  const context = useContext(ImageDataContext);
+export const usePhotoDataContext = (): PhotoDataContextType => {
+  const context = useContext(PhotoDataContext);
   if (!context) {
     throw new Error(
-      'useImageDataContext must be used within a ImageDataContextProvider',
+      'usePhotoDataContext must be used within a PhotoDataContextProvider',
     );
   }
   return context;
 };
 
-export const ImageDataContextProvider: React.FC<
-  ImageDataContextProviderProps
+export const PhotoDataContextProvider: React.FC<
+  PhotoDataContextProviderProps
 > = ({ children }) => {
   const [loading, setLoading] = useState<boolean>(false);
-  const [likedImages, setLikedImages] = useState<Record<string, number[]>>({});
+  const [wheelPhoto, setWheelPhoto] = useState<Photo | null>(null);
+  const [likedPhotos, setLikedPhotos] = useState<Record<string, Photo[]>>({});
   const [activeSearchData, setActiveSearchData] = useState<SearchData>({
     query: null,
     results: [],
   });
 
-  const toggleImageLike = (imageId: number) => {
-    const imageQuery = activeSearchData.query;
+  const togglePhotoLike = (newPhoto: Photo) => {
+    const photoQuery = activeSearchData.query;
 
-    if (!imageQuery) {
+    if (!photoQuery) {
       return;
     }
 
-    const record = likedImages[imageQuery];
+    const existingPhotos = likedPhotos[photoQuery];
 
-    // Add category with new image
-    if (!record) {
-      setLikedImages((lis) => ({
+    // Add category with new photo
+    if (!existingPhotos) {
+      setLikedPhotos((lis) => ({
         ...lis,
-        [imageQuery]: [imageId],
+        [photoQuery]: [newPhoto],
       }));
       return;
     }
 
-    // Remove from category if exists
-    if (record.indexOf(imageId) > -1) {
-      const updatedImages = record.filter((id) => id !== imageId);
+    const newPhotoRecord: Photo[] = [];
+    let photoExistsInRecord = false;
 
-      setLikedImages((lis) => ({
-        ...lis,
-        [imageQuery]: updatedImages,
-      }));
-      return;
+    for (const photo of existingPhotos) {
+      if (photo.id === newPhoto.id) {
+        photoExistsInRecord = true; // Implicitly removes it
+      } else {
+        newPhotoRecord.push(photo);
+      }
     }
 
-    // Add to existing category
-    const currImages = likedImages[imageQuery];
-
-    setLikedImages((lis) => ({
-      ...lis,
-      [imageQuery]: [...currImages, imageId],
-    }));
+    if (photoExistsInRecord) {
+      setLikedPhotos((lis) => ({
+        ...lis,
+        [photoQuery]: newPhotoRecord,
+      }));
+    } else {
+      setLikedPhotos((lis) => ({
+        ...lis,
+        [photoQuery]: [...existingPhotos, newPhoto],
+      }));
+    }
   };
 
   const updateSearchByTerm = debounce(async (query: string) => {
     try {
       const resp = await pexelsClient.photos.search({
         query,
+        orientation: 'landscape',
       });
 
       if ('photos' in resp) {
@@ -104,16 +112,18 @@ export const ImageDataContextProvider: React.FC<
   }, 500);
 
   return (
-    <ImageDataContext.Provider
+    <PhotoDataContext.Provider
       value={{
         loading,
-        likedImages,
-        toggleImageLike,
+        likedPhotos,
+        wheelPhoto,
+        togglePhotoLike,
+        setWheelPhoto,
         activeSearchData,
         updateSearchByTerm,
       }}
     >
       {children}
-    </ImageDataContext.Provider>
+    </PhotoDataContext.Provider>
   );
 };

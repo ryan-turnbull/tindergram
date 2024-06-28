@@ -4,18 +4,21 @@ import HomePage from './pages/home.tsx';
 import './styles.css';
 import { NextUIProvider } from '@nextui-org/react';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
-import { ImageDataContextProvider } from './data/images.tsx';
+import { PhotoDataContextProvider } from './data/images.tsx';
+import { LikedPhotoPage } from './pages/liked.tsx';
+import { routes } from './utils/routes.ts';
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <NextUIProvider>
-      <ImageDataContextProvider>
+      <PhotoDataContextProvider>
         <BrowserRouter>
           <Routes>
-            <Route path="/" Component={HomePage} />
+            <Route path={routes.home} Component={HomePage} />
+            <Route path={routes.liked} Component={LikedPhotoPage} />
           </Routes>
         </BrowserRouter>
-      </ImageDataContextProvider>
+      </PhotoDataContextProvider>
     </NextUIProvider>
   </React.StrictMode>,
 );
