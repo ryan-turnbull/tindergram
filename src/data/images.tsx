@@ -1,18 +1,20 @@
 import debounce from 'lodash.debounce';
 import React, { createContext, ReactNode, useContext, useState } from 'react';
 
-import { createClient, Photos } from 'pexels';
+import { createClient, Photo } from 'pexels';
 
 const pexelsClient = createClient(import.meta.env.VITE_PEXELS_API_PK);
 
 interface SearchData {
   query: string | null;
-  results: Photos['photos'];
+  results: Photo[];
 }
 
 interface ImageDataContextType {
   loading: boolean;
   activeSearchData: SearchData;
+  likedImages: Record<string, number[]>;
+  toggleImageLike: (id: number) => void;
   updateSearchByTerm: (term: string) => void;
 }
 
@@ -28,7 +30,9 @@ const ImageDataContext = createContext<ImageDataContextType | undefined>(
 export const useImageDataContext = (): ImageDataContextType => {
   const context = useContext(ImageDataContext);
   if (!context) {
-    throw new Error('useMyContext must be used within a MyContextProvider');
+    throw new Error(
+      'useImageDataContext must be used within a ImageDataContextProvider',
+    );
   }
   return context;
 };
@@ -37,10 +41,49 @@ export const ImageDataContextProvider: React.FC<
   ImageDataContextProviderProps
 > = ({ children }) => {
   const [loading, setLoading] = useState<boolean>(false);
+  const [likedImages, setLikedImages] = useState<Record<string, number[]>>({});
   const [activeSearchData, setActiveSearchData] = useState<SearchData>({
     query: null,
     results: [],
   });
+
+  const toggleImageLike = (imageId: number) => {
+    const imageQuery = activeSearchData.query;
+
+    if (!imageQuery) {
+      return;
+    }
+
+    const record = likedImages[imageQuery];
+
+    // Add category with new image
+    if (!record) {
+      setLikedImages((lis) => ({
+        ...lis,
+        [imageQuery]: [imageId],
+      }));
+      return;
+    }
+
+    // Remove from category if exists
+    if (record.indexOf(imageId) > -1) {
+      const updatedImages = record.filter((id) => id !== imageId);
+
+      setLikedImages((lis) => ({
+        ...lis,
+        [imageQuery]: updatedImages,
+      }));
+      return;
+    }
+
+    // Add to existing category
+    const currImages = likedImages[imageQuery];
+
+    setLikedImages((lis) => ({
+      ...lis,
+      [imageQuery]: [...currImages, imageId],
+    }));
+  };
 
   const updateSearchByTerm = debounce(async (query: string) => {
     try {
@@ -64,6 +107,8 @@ export const ImageDataContextProvider: React.FC<
     <ImageDataContext.Provider
       value={{
         loading,
+        likedImages,
+        toggleImageLike,
         activeSearchData,
         updateSearchByTerm,
       }}
