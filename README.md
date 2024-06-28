@@ -20,3 +20,4 @@ I think i'll use a basic React app w/ TS, Vite, NextUI, Tailwind. I'm mainly cho
 [] Search bar connected to data source, incl. state management of what is necessary
 [] Pull data through into a grid like view, with a like/dislike button on each grid cell. When clicked, it'll open in a full view
 [] Full screen image view
+[] Fancy animations
