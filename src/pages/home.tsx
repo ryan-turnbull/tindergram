@@ -15,6 +15,7 @@ function HomePage() {
     loading,
     wheelPhoto,
     likedPhotos,
+    resetSearch,
     setWheelPhoto,
     activeSearchData,
     updateSearchByTerm,
@@ -46,7 +47,7 @@ function HomePage() {
                 Welcome to{' '}
                 <span className="text-primary-500">Tindergram 🔥</span>
               </h1>
-              <p>The refinement tool for you creative vision</p>
+              <p>The refinement tool for your creative vision</p>
               <Input
                 placeholder="Enter your search term..."
                 onChange={handleSearchInputChange}
@@ -70,7 +71,13 @@ function HomePage() {
       </StickyHeaderLayout>
       {wheelPhoto && (
         <Modal show onClose={() => setWheelPhoto(null)}>
-          <PhotoWheel onComplete={() => setWheelPhoto(null)} />
+          <PhotoWheel
+            onComplete={() => {
+              resetSearch();
+              setSearchValue('');
+              setWheelPhoto(null);
+            }}
+          />
         </Modal>
       )}
     </>

@@ -57,7 +57,7 @@ export const LikedPhotoPage = () => {
                       height={IMAGE_DIMENSIONS_PX}
                       alt="Image showing query"
                       src={photo.src.small}
-                      className="cursor-pointer"
+                      className="cursor-pointer hover:opacity-80"
                     />
                     <div
                       className="bg-primary-500 text-white rounded-full h-4 w-4 absolute top-0 right-0 z-10 flex items-center justify-center cursor-pointer"

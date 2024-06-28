@@ -40,7 +40,7 @@ export const PhotoWheel = ({ onComplete }: { onComplete: () => void }) => {
 
   if (stackSubset.length === 0) {
     return (
-      <div className="bg-white rounded-2xl py-4 px-8 space-y-4">
+      <div className="bg-white rounded-2xl max-w-md py-4 px-8 space-y-4 mx-auto fade-in-up">
         <span className="text-3xl">👏</span>
         <h2 className="text-2xl font-bold">Great job!</h2>
         <p>
@@ -60,9 +60,9 @@ export const PhotoWheel = ({ onComplete }: { onComplete: () => void }) => {
   }
 
   return (
-    <div className="flex justify-between items-center gap-8 w-[700px] max-w-full h-[500px] max- mx-auto">
+    <div className="flex justify-between items-center gap-8 w-[700px] max-w-full h-[500px] max- mx-auto fade-in-up">
       <Button color="danger" onClick={handleReject}>
-        Delete 🚮
+        Ew 🤮
       </Button>
       <div className="relative w-full h-full">
         {stackSubset.map((photo, index) => {
@@ -88,7 +88,7 @@ export const PhotoWheel = ({ onComplete }: { onComplete: () => void }) => {
         })}
       </div>
       <Button color="success" onClick={handleLike}>
-        Like
+        Love
       </Button>
     </div>
   );

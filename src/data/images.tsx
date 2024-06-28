@@ -14,10 +14,11 @@ interface PhotoDataContextType {
   loading: boolean;
   activeSearchData: SearchData;
   wheelPhoto: Photo | null;
+  resetSearch: () => void;
   likedPhotos: Record<string, Photo[]>;
   togglePhotoLike: (photo: Photo) => void;
-  setWheelPhoto: (photo: Photo | null) => void;
   updateSearchByTerm: (term: string) => void;
+  setWheelPhoto: (photo: Photo | null) => void;
 }
 
 interface PhotoDataContextProviderProps {
@@ -27,6 +28,11 @@ interface PhotoDataContextProviderProps {
 const PhotoDataContext = createContext<PhotoDataContextType | undefined>(
   undefined,
 );
+
+const initialPhotoData: SearchData = {
+  query: null,
+  results: [],
+};
 
 // eslint-disable-next-line react-refresh/only-export-components
 export const usePhotoDataContext = (): PhotoDataContextType => {
@@ -45,10 +51,8 @@ export const PhotoDataContextProvider: React.FC<
   const [loading, setLoading] = useState<boolean>(false);
   const [wheelPhoto, setWheelPhoto] = useState<Photo | null>(null);
   const [likedPhotos, setLikedPhotos] = useState<Record<string, Photo[]>>({});
-  const [activeSearchData, setActiveSearchData] = useState<SearchData>({
-    query: null,
-    results: [],
-  });
+  const [activeSearchData, setActiveSearchData] =
+    useState<SearchData>(initialPhotoData);
 
   const togglePhotoLike = (newPhoto: Photo) => {
     const photoQuery = activeSearchData.query;
@@ -111,12 +115,17 @@ export const PhotoDataContextProvider: React.FC<
     }
   }, 500);
 
+  const resetSearch = () => {
+    setActiveSearchData(initialPhotoData);
+  };
+
   return (
     <PhotoDataContext.Provider
       value={{
         loading,
-        likedPhotos,
         wheelPhoto,
+        resetSearch,
+        likedPhotos,
         togglePhotoLike,
         setWheelPhoto,
         activeSearchData,

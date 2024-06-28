@@ -44,13 +44,15 @@ export const SearchResults = () => {
 
           return (
             <div key={res.id} className="relative">
-              <Image
-                height={IMAGE_DIMENSIONS_PX}
-                alt="Image showing query"
-                src={res.src.small}
-                className="cursor-pointer"
-                onClick={() => setWheelPhoto(res)}
-              />
+              <div className="cursor-pointer hover:opacity-80 transition-opacity">
+                <Image
+                  height={IMAGE_DIMENSIONS_PX}
+                  alt="Image showing query"
+                  src={res.src.small}
+                  onClick={() => setWheelPhoto(res)}
+                />
+              </div>
+
               <Button
                 isIconOnly
                 size="sm"
