@@ -97,6 +97,7 @@ const getResultsForQuery = async (query: string, ctx: Context) => {
 
 **Future extensions**
 
+- Mobile responsiveness
 - All of the logic I've got in that `data/photos.tsx` I'd likely move to the backend. Actions like liking photos, and storing categories/search history, could all be facilitated by storing this in a database of sorts, and have that be well unit tested. You'll notice if you refresh the page at any point, all the data is lost, sad face
 - Swiping _could_ be brought back, as well as key binds, for ease of use. Some experimentation here for sure.
 - Get the pagination working properly. You can uncommit the code within `search-results.tsx` and see the issue I was facing. I validated the offset was correctly being parsed through, but Pexels just didn't interpret it
