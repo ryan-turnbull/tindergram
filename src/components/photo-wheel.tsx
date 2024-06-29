@@ -1,15 +1,21 @@
 import { Button, Image } from '@nextui-org/react';
-import { usePhotoDataContext } from '../data/images';
+import { usePhotoDataContext } from '../data/photos';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { routes } from '../utils/routes';
 import { useReward } from 'react-rewards';
 
-export const PhotoWheel = ({ onComplete }: { onComplete: () => void }) => {
+const SHOWN_PHOTO_COUNT = 5;
+
+interface PhotoWheelProps {
+  onComplete: () => void;
+}
+
+export const PhotoWheel = ({ onComplete }: PhotoWheelProps) => {
   const navigate = useNavigate();
   const { reward } = useReward('lovePhotoButton', 'emoji', {
     emoji: ['❤️'],
-    elementCount: 5,
+    elementCount: 1,
     decay: 0.99,
     spread: 45,
     startVelocity: 10,
@@ -36,7 +42,7 @@ export const PhotoWheel = ({ onComplete }: { onComplete: () => void }) => {
     return;
   }
 
-  const stackSubset = sessionStack.slice(0, 3);
+  const stackSubset = sessionStack.slice(0, SHOWN_PHOTO_COUNT);
 
   const handleReject = () => {
     setSessionStack(sessionStack.slice(1));
@@ -44,7 +50,7 @@ export const PhotoWheel = ({ onComplete }: { onComplete: () => void }) => {
 
   const handleLike = () => {
     reward();
-    togglePhotoLike(stackSubset[0]);
+    togglePhotoLike(stackSubset[0], activeSearchData.query);
     setSessionStack(sessionStack.slice(1));
   };
 
@@ -61,7 +67,13 @@ export const PhotoWheel = ({ onComplete }: { onComplete: () => void }) => {
         </p>
         <div className="flex justify-end items-center gap-4">
           <Button onClick={onComplete}>Close</Button>
-          <Button color="danger" onClick={() => navigate(routes.liked)}>
+          <Button
+            color="danger"
+            onClick={() => {
+              onComplete();
+              navigate(routes.liked);
+            }}
+          >
             View likes
           </Button>
         </div>
@@ -72,7 +84,7 @@ export const PhotoWheel = ({ onComplete }: { onComplete: () => void }) => {
   return (
     <div className="flex justify-between items-center gap-8 w-[700px] max-w-full h-[500px] max- mx-auto fade-in-up">
       <Button color="danger" onClick={handleReject}>
-        Ew 🤮
+        Nope 🚮
       </Button>
       <div className="relative w-full h-full">
         {stackSubset.map((photo, index) => {
@@ -98,7 +110,7 @@ export const PhotoWheel = ({ onComplete }: { onComplete: () => void }) => {
         })}
       </div>
       <Button color="success" id="lovePhotoButton" onClick={handleLike}>
-        Love
+        Yes! 👍
       </Button>
     </div>
   );

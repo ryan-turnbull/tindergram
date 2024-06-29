@@ -2,10 +2,10 @@ import { BreadcrumbItem, Breadcrumbs, Image } from '@nextui-org/react';
 import { StickyHeaderLayout } from '../layouts/sticky-header';
 import { useNavigate } from 'react-router-dom';
 import { routes } from '../utils/routes';
-import { usePhotoDataContext } from '../data/images';
+import { usePhotoDataContext } from '../data/photos';
 import { useEffect } from 'react';
 
-const IMAGE_DIMENSIONS_PX = 300;
+const PHOTO_DIMENSIONS_PX = 300;
 
 export const LikedPhotoPage = () => {
   const navigate = useNavigate();
@@ -23,6 +23,7 @@ export const LikedPhotoPage = () => {
 
   return (
     <StickyHeaderLayout
+      isActive
       headerContent={
         <div className="space-y-2 py-6 max-w-sm px-4 w-full mx-auto">
           <Breadcrumbs>
@@ -41,7 +42,7 @@ export const LikedPhotoPage = () => {
         {Object.keys(likedPhotos).map((likedPhotoCategory) => {
           const photos = likedPhotos[likedPhotoCategory];
 
-          if (!photos) {
+          if (!photos || photos.length === 0) {
             return null;
           }
 
@@ -54,16 +55,16 @@ export const LikedPhotoPage = () => {
                 {photos.map((photo) => (
                   <li key={photo.id} className="relative">
                     <Image
-                      height={IMAGE_DIMENSIONS_PX}
-                      alt="Image showing query"
+                      height={PHOTO_DIMENSIONS_PX}
+                      alt="Photo showing query"
                       src={photo.src.small}
-                      className="cursor-pointer hover:opacity-80"
+                      className="hover:opacity-80"
                     />
                     <div
-                      className="bg-primary-500 text-white rounded-full h-4 w-4 absolute top-0 right-0 z-10 flex items-center justify-center cursor-pointer"
-                      onClick={() => togglePhotoLike(photo)}
+                      className="bg-primary-500 text-white text-sm rounded-full h-4 w-4 absolute top-0 right-0 z-10 flex items-center justify-center cursor-pointer"
+                      onClick={() => togglePhotoLike(photo, likedPhotoCategory)}
                     >
-                      x
+                      ⤫
                     </div>
                   </li>
                 ))}

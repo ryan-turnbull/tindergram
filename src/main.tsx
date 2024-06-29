@@ -1,11 +1,12 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import HomePage from './pages/home.tsx';
 import './styles.css';
 import { NextUIProvider } from '@nextui-org/react';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
-import { PhotoDataContextProvider } from './data/images.tsx';
-import { LikedPhotoPage } from './pages/liked.tsx';
+import { PhotoDataContextProvider } from './data/photos.tsx';
+
+import { HomePage } from './pages/home';
+import { LikedPhotoPage } from './pages/liked';
 import { routes } from './utils/routes.ts';
 
 ReactDOM.createRoot(document.getElementById('root')!).render(

@@ -1,14 +1,14 @@
 import { Input } from '@nextui-org/react';
-import { usePhotoDataContext } from '../data/images';
-import { SearchResults } from '../components/search-results';
+import { usePhotoDataContext } from '../../data/photos';
+import { SearchResults } from './search-results';
 import { useNavigate } from 'react-router-dom';
-import { routes } from '../utils/routes';
-import { StickyHeaderLayout } from '../layouts/sticky-header';
+import { routes } from '../../utils/routes';
+import { StickyHeaderLayout } from '../../layouts/sticky-header';
 import { useState } from 'react';
-import { Modal } from '../components/modal';
-import { PhotoWheel } from '../components/photo-wheel';
+import { Modal } from '../../components/modal';
+import { PhotoWheel } from '../../components/photo-wheel';
 
-function HomePage() {
+export const HomePage = () => {
   const navigate = useNavigate();
 
   const {
@@ -40,6 +40,7 @@ function HomePage() {
   return (
     <>
       <StickyHeaderLayout
+        isActive={activeSearchData.results.length > 0 || loading}
         headerContent={
           <>
             <div className="text-center space-y-2 py-6 max-w-sm px-4 w-full mx-auto">
@@ -59,7 +60,7 @@ function HomePage() {
                 className="fixed top-4 right-4 fade-in-up cursor-pointer"
                 onClick={() => navigate(routes.liked)}
               >
-                <p>Liked photos</p>
+                <p>❤️ Liked photos</p>
               </div>
             )}
             <span className="fixed top-4 right-24" id="heartEmojiGen" />
@@ -83,6 +84,4 @@ function HomePage() {
       )}
     </>
   );
-}
-
-export default HomePage;
+};

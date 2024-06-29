@@ -3,6 +3,7 @@ import React, { createContext, ReactNode, useContext, useState } from 'react';
 
 import { createClient, Photo } from 'pexels';
 
+const PAGE_SIZE = 20;
 const pexelsClient = createClient(import.meta.env.VITE_PEXELS_API_PK);
 
 interface SearchData {
@@ -17,7 +18,7 @@ interface PhotoDataContextType {
   wheelPhoto: Photo | null;
   resetSearch: () => void;
   likedPhotos: Record<string, Photo[]>;
-  togglePhotoLike: (photo: Photo) => void;
+  togglePhotoLike: (photo: Photo, category: string | null) => void;
   updateSearchByTerm: (term: string) => void;
   setWheelPhoto: (photo: Photo | null) => void;
   loadMorePhotos: () => void;
@@ -57,20 +58,18 @@ export const PhotoDataContextProvider: React.FC<
   const [activeSearchData, setActiveSearchData] =
     useState<SearchData>(initialPhotoData);
 
-  const togglePhotoLike = (newPhoto: Photo) => {
-    const photoQuery = activeSearchData.query;
-
-    if (!photoQuery) {
-      return;
+  const togglePhotoLike = (newPhoto: Photo, category: string | null) => {
+    if (!category) {
+      return null;
     }
 
-    const existingPhotos = likedPhotos[photoQuery];
+    const existingPhotos = likedPhotos[category];
 
     // Add category with new photo
     if (!existingPhotos) {
       setLikedPhotos((lis) => ({
         ...lis,
-        [photoQuery]: [newPhoto],
+        [category]: [newPhoto],
       }));
       return;
     }
@@ -89,12 +88,12 @@ export const PhotoDataContextProvider: React.FC<
     if (photoExistsInRecord) {
       setLikedPhotos((lis) => ({
         ...lis,
-        [photoQuery]: newPhotoRecord,
+        [category]: newPhotoRecord,
       }));
     } else {
       setLikedPhotos((lis) => ({
         ...lis,
-        [photoQuery]: [...existingPhotos, newPhoto],
+        [category]: [...existingPhotos, newPhoto],
       }));
     }
   };
@@ -105,7 +104,7 @@ export const PhotoDataContextProvider: React.FC<
       const resp = await pexelsClient.photos.search({
         query,
         orientation: 'landscape',
-        per_page: 30,
+        per_page: PAGE_SIZE,
       });
 
       if ('photos' in resp) {
